@@ -3,7 +3,10 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 // Load your Stripe publishable key
-const stripePromise = loadStripe("pk_test_51QArtIRuRJCNcVWeaOUQOkR0Umk7V6GCmfy2jf7Eopg2Tps0nlx6OUrRpUvtKVeuJ4ff1SANE1bxqQqtB4Uo6Ann00HXBc75qK"); // Replace with your Stripe publishable key
+const stripePromise = loadStripe(process.env.STRIPE_PUBLISHABLE_KEY || ""); // Replace with your Stripe publishable key
+if (!process.env.STRIPE_PUBLISHABLE_KEY) {
+    console.error("STRIPE_PUBLISHABLE_KEY is not defined in the environment variables.");
+}
 
 const CheckoutForm = () => {
     const stripe = useStripe();
@@ -48,10 +51,15 @@ const CheckoutPage = () => {
 
     useEffect(() => {
         // Call the Lambda function to create a PaymentIntent
-        fetch("https://api.stripe.com/v1/payment_intents", { // Replace with your API Gateway endpoint
+        // fetch("https://api.stripe.com/v1/payment_intents", { // Replace with your API Gateway endpoint
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ amount: 10, currency: "usd" }), // Replace with your desired amount and currency
+        // })
+        fetch("https://5ie2lzvjdup55eqzwv22w7kzji0cusos.lambda-url.us-east-1.on.aws/", { // Replace with your API Gateway endpoint
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount: 10, currency: "usd" }), // Replace with your desired amount and currency
+            body: JSON.stringify({ amount: 1000, currency: "usd" }), // Replace with your desired amount and currency
         })
             .then((res) => res.json())
             .then((data) => setClientSecret(data.clientSecret))
